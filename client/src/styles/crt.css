@@ -1,0 +1,185 @@
+/* ════════════════════════════════════════════
+   CRT.CSS — Enhanced CRT Monitor Frame Effect
+   Finer scanlines, RGB fringing, phosphor bleed,
+   power-on animation, improved curvature
+   ════════════════════════════════════════════ */
+
+.crt-frame {
+  position: relative;
+  border: 10px solid #111;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 2px #222,
+    0 0 0 4px #1a1a1a,
+    0 0 40px rgba(0, 255, 65, 0.15),
+    0 0 80px rgba(0, 255, 65, 0.05),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  background: #000;
+  animation: powerOn 0.6s ease-out;
+  /* Subtle 3D bezel */
+  border-top-color: #1a1a1a;
+  border-left-color: #161616;
+  border-right-color: #0e0e0e;
+  border-bottom-color: #0a0a0a;
+}
+
+/* Live mode: red phosphor glow instead of green */
+.crt-frame.live {
+  box-shadow:
+    0 0 0 2px #222,
+    0 0 0 4px #1a1a1a,
+    0 0 40px rgba(255, 0, 0, 0.2),
+    0 0 80px rgba(255, 0, 0, 0.08),
+    inset 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Fine scanline overlay with RGB color fringing */
+.crt-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* Fine scanlines */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(0, 0, 0, 0.06) 1px,
+      rgba(0, 0, 0, 0.06) 2px
+    ),
+    /* Subtle RGB pixel pattern */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 0, 0, 0.02),
+      rgba(0, 255, 0, 0.02) 1px,
+      rgba(0, 0, 255, 0.02) 2px,
+      transparent 3px
+    );
+  pointer-events: none;
+  z-index: 10;
+  animation: scanlineScroll 6s linear infinite;
+}
+
+/* Vignette effect — darker edges for CRT realism */
+.crt-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.35) 80%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* Phosphor bleed — radial glow behind content */
+.crt-frame .crt-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 65, 0.03) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.crt-frame.live .crt-screen::before {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 0, 0, 0.04) 0%,
+    transparent 70%
+  );
+}
+
+/* REC indicator for live broadcasts */
+.crt-rec {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  font-size: 1rem;
+  color: #ff0000;
+  letter-spacing: 2px;
+  font-family: 'Share Tech Mono', 'VT323', monospace;
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+}
+
+.crt-rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff0000;
+  animation: glowBreathe 1s ease-in-out infinite;
+  box-shadow: 0 0 6px #ff0000, 0 0 12px rgba(255, 0, 0, 0.4);
+}
+
+/* SIGNAL LOST static noise overlay — improved grain */
+.crt-static {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    /* Noise grain pattern */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E"),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.04) 0px,
+      transparent 1px,
+      transparent 3px
+    );
+  animation: staticNoise 0.1s steps(6) infinite;
+}
+
+.crt-static-text {
+  color: #ff0000;
+  font-size: 2rem;
+  letter-spacing: 6px;
+  animation: glitch 0.3s infinite;
+  text-shadow: 0 0 20px #ff0000, 0 0 40px rgba(255, 0, 0, 0.3);
+  z-index: 16;
+}
+
+/* Screen content with subtle barrel distortion */
+.crt-screen {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-screen video,
+.crt-screen iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+/* Subtle horizontal flicker line that moves down screen */
+.crt-frame::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 255, 255, 0.03),
+    transparent
+  );
+  z-index: 12;
+  animation: scanlineScroll 3s linear infinite;
+  pointer-events: none;
+}
